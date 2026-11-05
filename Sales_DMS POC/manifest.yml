@@ -1,0 +1,23 @@
+---
+applications:
+  - name: atp-promise-agent
+    buildpacks:
+      - nodejs_buildpack
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    command: node server/index.js
+    health-check-type: http
+    health-check-http-endpoint: /api/v1/health
+    timeout: 180
+    env:
+      NODE_ENV: production
+      SAP_CONNECTION_MODE: destination
+      SAP_DESTINATION_NAME: DMS_MT2_S4
+      SAP_SYSTEM_LABEL: DMS OTC MT2 (client 100)
+      OMP_CONNECTION_MODE: mock
+      AICORE_MODEL: gpt-4o-mini
+      AUDIT_LOG_FILE: /tmp/atp-agent/audit.jsonl
+    services:
+      - atp-agent-destination
+      - atp-agent-connectivity

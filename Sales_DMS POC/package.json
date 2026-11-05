@@ -1,0 +1,37 @@
+{
+  "name": "atp-promise-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backorder Reliability Agent - chat assistant over SAP S/4HANA aATP (DMS OTC MT2) and OMP planned supply",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "concurrently -k -n api,web -c red,blue \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node --watch server/index.js",
+    "dev:web": "vite",
+    "build": "tsc -b && vite build",
+    "test": "node --test server/",
+    "preview": "npm run build && npm start"
+  },
+  "dependencies": {
+    "@sap-ai-sdk/orchestration": "^2.17.0",
+    "@sap-cloud-sdk/connectivity": "^4.10.0",
+    "@sap-cloud-sdk/http-client": "^4.10.0",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^9.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "~5.9.2",
+    "vite": "^6.3.5"
+  }
+}
