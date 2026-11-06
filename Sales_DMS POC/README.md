@@ -57,7 +57,7 @@ OMP planned orders are shown as information ("not yet in SAP execution") and nev
 
 ### Option A - BTP Destination + Cloud Connector (recommended)
 
-The architecture in the proposal. In the J&J BTP subaccount that has the Cloud Connector to MT dev:
+The architecture in the proposal. The app uses the destination **`MT_TRANSCEND_S4_BASIC`** (override with `SAP_DESTINATION_NAME`). If it already exists in the J&J subaccount, only check that the Cloud Connector allows the two service paths in step 1. Otherwise, in the subaccount that has the Cloud Connector to MT dev:
 
 1. **Cloud Connector** - add a system mapping: back-end type *ABAP System*, protocol HTTPS, internal host `mtdev.jnj.com:443`, virtual host e.g. `dms-mt2:443`. Allow resources (path and all sub-paths):
    - `/sap/opu/odata4/sap/api_product_availy_info/`
@@ -66,7 +66,7 @@ The architecture in the proposal. In the J&J BTP subaccount that has the Cloud C
 
    | Property | Value |
    |---|---|
-   | Name | `DMS_MT2_S4` |
+   | Name | `MT_TRANSCEND_S4_BASIC` |
    | Type | HTTP |
    | URL | `http://dms-mt2:443` (the virtual host) |
    | Proxy Type | OnPremise |
@@ -172,7 +172,7 @@ The script checks the CF target with you, runs the tests and build, creates and 
 
 ## Open questions for the J&J team
 
-1. Which BTP subaccount / CF org and space has the Cloud Connector to MT dev, and can we create destination `DMS_MT2_S4` there (or is there an existing one)?
+1. Which BTP subaccount / CF org and space holds the destination `MT_TRANSCEND_S4_BASIC` (and the Cloud Connector to MT dev), so we can deploy there? Does the destination carry `sap-client=100`, and does its Cloud Connector mapping allow the two ATP service paths?
 2. If CPI is the intended path (the OAuth key we received is a CPI runtime key): which iFlow URL proxies the two ATP services?
 3. Technical user for DMS-100 and its roles for both services.
 4. Test materials, plants and quantities in DMS-100 with known stock and ATP behaviour (also requested by Pramod).

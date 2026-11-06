@@ -9,7 +9,7 @@
 #   APP_BASIC_AUTH_USER / APP_BASIC_AUTH_PASSWORD   shared login for the POC URL (strongly recommended)
 #   SKIP_TESTS=1                      skip `npm test`
 #
-# Prerequisite in the BTP subaccount (see README): a Destination named DMS_MT2_S4 pointing at the
+# Prerequisite in the BTP subaccount (see README): a Destination named MT_TRANSCEND_S4_BASIC pointing at the
 # Cloud Connector virtual host for MT dev, and the Cloud Connector connected to this subaccount.
 set -euo pipefail
 

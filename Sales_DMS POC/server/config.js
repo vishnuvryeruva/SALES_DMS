@@ -55,7 +55,7 @@ export const config = {
   sap: {
     ...upstream('SAP', {
       mode: 'mock',
-      destinationName: 'DMS_MT2_S4',
+      destinationName: 'MT_TRANSCEND_S4_BASIC',
       defaultQuery: sapClient ? { 'sap-client': sapClient } : {},
     }),
     availabilityServicePath: str(
