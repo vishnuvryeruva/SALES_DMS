@@ -10,7 +10,7 @@ A chat assistant for J&J MedTech customer service and planners. Ask *"Can we pro
 
 SAP AI Core (orchestration, `gpt-4o-mini`) handles the conversation and calls the tools. **The model never sets the rating** - it comes from `server/reliability.js` and is shown with its evidence, timestamp and a reference id. Without AI Core the agent falls back to a built-in rule-based parser.
 
-Target system: **DMS - OTC MT2** (MedTech S/4HANA), client 100.
+Target system: **DMS - OTC MT2** (MedTech S/4HANA), client 200.
 
 ## Run locally
 
@@ -72,9 +72,9 @@ The architecture in the proposal. The app uses the destination **`MT_TRANSCEND_S
    | Proxy Type | OnPremise |
    | Authentication | BasicAuthentication (technical user) - Principal Propagation later |
    | Location ID | only if the Cloud Connector uses one |
-   | Additional property `sap-client` | `100` |
+   | Additional property `sap-client` | `200` (or not set) |
 
-3. Deploy (below). The manifest sets `SAP_CONNECTION_MODE=destination`. If the destination does not carry `sap-client`, run `cf set-env atp-promise-agent SAP_CLIENT 100`.
+3. Deploy (below). The manifest sets `SAP_CONNECTION_MODE=destination` and `SAP_CLIENT=200`. The destination is shared, so if it carries a different `sap-client`, align it with the J&J team rather than editing it.
 
 ### Option B - Cloud Integration (CPI) proxy
 
@@ -100,7 +100,7 @@ SAP_BASE_URL=https://mtdev.jnj.com
 SAP_AUTH_TYPE=basic
 SAP_USERNAME=...
 SAP_PASSWORD=...
-SAP_CLIENT=100
+SAP_CLIENT=200
 ```
 
 Note: the service URL in the email ended in `/001`; the one that worked in DMS-100 ends in `/0001`, which is the default here. The earlier HTTPS call returned an HTML login page, which the app reports as "intercepted by a login/SSO page" instead of failing silently.
@@ -172,10 +172,10 @@ The script checks the CF target with you, runs the tests and build, creates and 
 
 ## Open questions for the J&J team
 
-1. Which BTP subaccount / CF org and space holds the destination `MT_TRANSCEND_S4_BASIC` (and the Cloud Connector to MT dev), so we can deploy there? Does the destination carry `sap-client=100`, and does its Cloud Connector mapping allow the two ATP service paths?
+1. Which BTP subaccount / CF org and space holds the destination `MT_TRANSCEND_S4_BASIC` (and the Cloud Connector to MT dev), so we can deploy there? The destination user is `CZ5BASDMS`: does it exist in client 200, does the destination carry `sap-client=200` (or none), and does its Cloud Connector mapping allow the two ATP service paths?
 2. If CPI is the intended path (the OAuth key we received is a CPI runtime key): which iFlow URL proxies the two ATP services?
-3. Technical user for DMS-100 and its roles for both services.
-4. Test materials, plants and quantities in DMS-100 with known stock and ATP behaviour (also requested by Pramod).
+3. Roles for `CZ5BASDMS` in DMS-200 for both services.
+4. Test materials, plants and quantities in DMS-200 with known stock and ATP behaviour (also requested by Pramod).
 5. Is the characteristic catalog / supply protection active, and which characteristics must be sent (shipping point, customer group, sales document type, ship-to)?
 6. OMP API contract and timeline (Chandra).
 7. AI Core instance and model access in the target subaccount.

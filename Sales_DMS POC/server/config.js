@@ -50,7 +50,7 @@ const sapClient = str('SAP_CLIENT');
 export const config = {
   port: num('PORT', 3000),
   nodeEnv: str('NODE_ENV', 'development'),
-  systemLabel: str('SAP_SYSTEM_LABEL', 'DMS OTC MT2 (client 100)'),
+  systemLabel: str('SAP_SYSTEM_LABEL', 'DMS OTC MT2 (client 200)'),
 
   sap: {
     ...upstream('SAP', {
