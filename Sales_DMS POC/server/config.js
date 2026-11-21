@@ -50,12 +50,12 @@ const sapClient = str('SAP_CLIENT');
 export const config = {
   port: num('PORT', 3000),
   nodeEnv: str('NODE_ENV', 'development'),
-  systemLabel: str('SAP_SYSTEM_LABEL', 'DMS OTC MT2 (client 200)'),
+  systemLabel: str('SAP_SYSTEM_LABEL', 'S/4HANA SMS (client 100)'),
 
   sap: {
     ...upstream('SAP', {
       mode: 'mock',
-      destinationName: 'MT_TRANSCEND_S4_BASIC',
+      destinationName: 'MT_TRANSCEND_SMS_BASIC',
       defaultQuery: sapClient ? { 'sap-client': sapClient } : {},
     }),
     availabilityServicePath: str(

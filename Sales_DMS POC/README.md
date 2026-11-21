@@ -10,7 +10,7 @@ A chat assistant for J&J MedTech customer service and planners. Ask *"Can we pro
 
 SAP AI Core (orchestration, `gpt-4o-mini`) handles the conversation and calls the tools. **The model never sets the rating** - it comes from `server/reliability.js` and is shown with its evidence, timestamp and a reference id. Without AI Core the agent falls back to a built-in rule-based parser.
 
-Target system: **DMS - OTC MT2** (MedTech S/4HANA), client 200.
+Target system: **SMS-100** (MedTech S/4HANA SMS, client 100) via the BTP destination `MT_TRANSCEND_SMS_BASIC`.
 
 ## Run locally
 
@@ -51,30 +51,33 @@ From the proposal, with `RULE_GAP_TOLERANCE_PCT` (default 10%) as the "material 
 
 OMP planned orders are shown as information ("not yet in SAP execution") and never raise a rating. Assumptions are listed on every card - by default the requested date is used as the material availability date and the MRP area equals the plant.
 
-## Connecting to DMS OTC MT2
+## Connecting to SMS-100
 
-`mtdev.jnj.com` only resolves inside the J&J network, so a laptop outside it cannot call SAP directly. Choose one of three connection modes with `SAP_CONNECTION_MODE`:
+The J&J S/4 hosts only resolve inside the J&J network, so a laptop outside it cannot call SAP directly. Choose one of three connection modes with `SAP_CONNECTION_MODE`:
 
 ### Option A - BTP Destination + Cloud Connector (recommended)
 
-The architecture in the proposal. The app uses the destination **`MT_TRANSCEND_S4_BASIC`** (override with `SAP_DESTINATION_NAME`). If it already exists in the J&J subaccount, only check that the Cloud Connector allows the two service paths in step 1. Otherwise, in the subaccount that has the Cloud Connector to MT dev:
+The architecture in the proposal. The app uses the destination **`MT_TRANSCEND_SMS_BASIC`** (override with `SAP_DESTINATION_NAME`). The J&J team created it on 2026-11-19 and *Check Connection* reports the back end reachable from the Cloud Connector, so only check that the Cloud Connector allows the two service paths in step 1. A reachable host does not prove the paths are allowed.
 
-1. **Cloud Connector** - add a system mapping: back-end type *ABAP System*, protocol HTTPS, internal host `mtdev.jnj.com:443`, virtual host e.g. `dms-mt2:443`. Allow resources (path and all sub-paths):
+1. **Cloud Connector** - the system mapping behind the destination must allow these resources (path and all sub-paths):
    - `/sap/opu/odata4/sap/api_product_availy_info/`
    - `/sap/opu/odata4/sap/api_avail_to_promise_check/`
-2. **Destination** (Connectivity > Destinations):
+2. **Destination** (Connectivity > Destinations) - as configured by the J&J team:
 
    | Property | Value |
    |---|---|
-   | Name | `MT_TRANSCEND_S4_BASIC` |
+   | Name | `MT_TRANSCEND_SMS_BASIC` |
+   | Description | Destination for S/4HANA SMS-100 system to MT IDEV - ATP Agent |
    | Type | HTTP |
-   | URL | `http://dms-mt2:443` (the virtual host) |
+   | URL | the Cloud Connector virtual host for SMS |
    | Proxy Type | OnPremise |
-   | Authentication | BasicAuthentication (technical user) - Principal Propagation later |
-   | Location ID | only if the Cloud Connector uses one |
-   | Additional property `sap-client` | `200` (or not set) |
+   | Authentication | BasicAuthentication, technical user `CZ5BASSMS` - Principal Propagation later |
+   | Location ID | as set on the destination |
+   | Additional property `sap-client` | `100` (or not set) |
 
-3. Deploy (below). The manifest sets `SAP_CONNECTION_MODE=destination` and `SAP_CLIENT=200`. The destination is shared, so if it carries a different `sap-client`, align it with the J&J team rather than editing it.
+   The technical user's password is stored only in the destination. Do not copy it into this repo, `.env`, or `manifest.yml`.
+
+3. Deploy (below). The manifest sets `SAP_CONNECTION_MODE=destination` and `SAP_CLIENT=100`. The destination is shared, so if it carries a different `sap-client`, align it with the J&J team rather than editing it.
 
 ### Option B - Cloud Integration (CPI) proxy
 
@@ -100,7 +103,7 @@ SAP_BASE_URL=https://mtdev.jnj.com
 SAP_AUTH_TYPE=basic
 SAP_USERNAME=...
 SAP_PASSWORD=...
-SAP_CLIENT=200
+SAP_CLIENT=100
 ```
 
 Note: the service URL in the email ended in `/001`; the one that worked in DMS-100 ends in `/0001`, which is the default here. The earlier HTTPS call returned an HTML login page, which the app reports as "intercepted by a login/SSO page" instead of failing silently.
@@ -172,10 +175,10 @@ The script checks the CF target with you, runs the tests and build, creates and 
 
 ## Open questions for the J&J team
 
-1. Which BTP subaccount / CF org and space holds the destination `MT_TRANSCEND_S4_BASIC` (and the Cloud Connector to MT dev), so we can deploy there? The destination user is `CZ5BASDMS`: does it exist in client 200, does the destination carry `sap-client=200` (or none), and does its Cloud Connector mapping allow the two ATP service paths?
+1. Which BTP subaccount / CF org and space holds the destination `MT_TRANSCEND_SMS_BASIC` (and the Cloud Connector to SMS), so we can deploy there? The destination user is `CZ5BASSMS`: does the destination carry `sap-client=100` (or none), and does its Cloud Connector mapping allow the two ATP service paths?
 2. If CPI is the intended path (the OAuth key we received is a CPI runtime key): which iFlow URL proxies the two ATP services?
-3. Roles for `CZ5BASDMS` in DMS-200 for both services.
-4. Test materials, plants and quantities in DMS-200 with known stock and ATP behaviour (also requested by Pramod).
+3. Roles for `CZ5BASSMS` in SMS-100 for both services.
+4. Test materials, plants and quantities in SMS-100 with known stock and ATP behaviour (also requested by Pramod).
 5. Is the characteristic catalog / supply protection active, and which characteristics must be sent (shipping point, customer group, sales document type, ship-to)?
 6. OMP API contract and timeline (Chandra).
 7. AI Core instance and model access in the target subaccount.

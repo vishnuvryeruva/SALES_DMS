@@ -13,9 +13,9 @@ applications:
     env:
       NODE_ENV: production
       SAP_CONNECTION_MODE: destination
-      SAP_DESTINATION_NAME: MT_TRANSCEND_S4_BASIC
-      SAP_CLIENT: "200"
-      SAP_SYSTEM_LABEL: DMS OTC MT2 (client 200)
+      SAP_DESTINATION_NAME: MT_TRANSCEND_SMS_BASIC
+      SAP_CLIENT: "100"
+      SAP_SYSTEM_LABEL: S/4HANA SMS (client 100)
       OMP_CONNECTION_MODE: mock
       AICORE_MODEL: gpt-4o-mini
       AUDIT_LOG_FILE: /tmp/atp-agent/audit.jsonl
